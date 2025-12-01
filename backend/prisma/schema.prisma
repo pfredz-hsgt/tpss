@@ -1,0 +1,316 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+enum PassoverStatus {
+  PENDING
+  ACKNOWLEDGED
+}
+
+enum NotificationType {
+  ANNOUNCEMENT
+  PASSOVER
+  SYSTEM
+}
+
+
+model User {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String
+  email     String?  @unique
+  fullName  String
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  groups         GroupUser[]
+  announcements  Announcement[] @relation("AnnouncementAuthor")
+  passoversOut   Passover[]     @relation("OutgoingUser")
+  passoversIn    Passover[]     @relation("IncomingUser")
+  passoverResponses PassoverResponse[]
+  announcementResponses AnnouncementResponse[]
+  notifications  Notification[]
+  taggedAnnouncements AnnouncementTaggedUser[]
+  temperatureReports TemperatureReport[]
+}
+
+model Group {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  users           GroupUser[]
+  announcements   AnnouncementTaggedGroup[]
+  passovers       Passover[]
+}
+
+model GroupUser {
+  id        String   @id @default(cuid())
+  userId    String
+  groupId   String
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, groupId])
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  color     String?
+  icon      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  announcements Announcement[]
+  templates     Template[]
+  passovers     Passover[]
+}
+
+model Template {
+  id         String   @id @default(cuid())
+  categoryId String
+  name       String
+  questions  Json     // Array of question objects
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@index([categoryId])
+}
+
+model Announcement {
+  id         String     @id @default(cuid())
+  title      String
+  content    String     // Rich text content
+  categoryId String
+  authorId   String
+  isSticky   Boolean    @default(false)
+  isPinned   Boolean    @default(false)
+  targetDate DateTime?  // Specific date instead of enum
+  createdAt  DateTime   @default(now())
+  archivedAt DateTime?
+
+  // Relations
+  category      Category                  @relation(fields: [categoryId], references: [id])
+  author        User                      @relation("AnnouncementAuthor", fields: [authorId], references: [id])
+  taggedUsers   AnnouncementTaggedUser[]
+  taggedGroups  AnnouncementTaggedGroup[]
+  responses     AnnouncementResponse[]
+
+  @@index([categoryId])
+  @@index([authorId])
+  @@index([createdAt])
+  @@index([isSticky, isPinned])
+  @@index([targetDate])
+}
+
+model AnnouncementTaggedUser {
+  id            String       @id @default(cuid())
+  announcementId String
+  userId        String
+  createdAt     DateTime     @default(now())
+
+  announcement Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([announcementId, userId])
+  @@index([userId])
+}
+
+model AnnouncementTaggedGroup {
+  id            String       @id @default(cuid())
+  announcementId String
+  groupId      String
+  createdAt     DateTime     @default(now())
+
+  announcement Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  group        Group        @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([announcementId, groupId])
+  @@index([groupId])
+}
+
+model AnnouncementResponse {
+  id            String      @id @default(cuid())
+  announcementId String
+  userId        String
+  response      String      // Response text (e.g., "supplied", "received", or custom text)
+  createdAt     DateTime    @default(now())
+
+  // Relations
+  announcement Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([announcementId, userId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Passover {
+  id             String         @id @default(cuid())
+  outgoingUserId String
+  incomingUserId String?        // Optional - null when using groupId
+  groupId        String?        // Optional - for group-based notifications
+  categoryId     String
+  content        Json           // Structured data (TDM/TPN cases, tasks, equipment, transport)
+  attachments    Json?          // Array of file attachments (images/documents/PDFs)
+  status         PassoverStatus @default(PENDING)
+  createdAt      DateTime       @default(now())
+  acknowledgedAt DateTime?
+  archivedAt     DateTime?
+
+  // Relations
+  outgoingUser User              @relation("OutgoingUser", fields: [outgoingUserId], references: [id])
+  incomingUser User?             @relation("IncomingUser", fields: [incomingUserId], references: [id])
+  group        Group?            @relation(fields: [groupId], references: [id])
+  category     Category          @relation(fields: [categoryId], references: [id])
+  responses    PassoverResponse[]
+
+  @@index([outgoingUserId])
+  @@index([incomingUserId])
+  @@index([groupId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([archivedAt])
+}
+
+model PassoverResponse {
+  id         String   @id @default(cuid())
+  passoverId String
+  userId     String
+  response   Json     // Checkbox state and timestamp
+  createdAt  DateTime @default(now())
+
+  // Relations
+  passover Passover @relation(fields: [passoverId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([passoverId, userId])
+  @@index([userId])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  relatedId String?          // ID of related announcement or passover
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+}
+
+// Temperature Monitoring Models
+
+model FridgeSection {
+  id          String   @id @default(cuid())
+  name        String   // e.g., "Farmasi Pesakit Dalam"
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  fridges     Fridge[]
+  picContacts PICContact[]
+
+  @@index([sortOrder])
+}
+
+model Fridge {
+  id             String        @id @default(cuid())
+  sectionId      String
+  name           String        // e.g., "Fridge 01", "Fridge 02"
+  sortOrder      Int           @default(0)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  // Relations
+  section        FridgeSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  reportEntries  TemperatureReportEntry[]
+
+  @@index([sectionId])
+  @@index([sortOrder])
+}
+
+model PICContact {
+  id          String        @id @default(cuid())
+  sectionId   String
+  name        String
+  phoneNumber String
+  sortOrder   Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Relations
+  section     FridgeSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@index([sectionId])
+  @@index([sortOrder])
+}
+
+model TemperatureReport {
+  id          String    @id @default(cuid())
+  date        DateTime  // Date of the report
+  time        String    // Time slot: "12am", "2am", "4am", "6am"
+  remarks     String?   // Additional findings/issues
+  submittedBy String    // User ID who submitted
+  createdAt   DateTime  @default(now())
+
+  // Relations
+  submitter   User      @relation(fields: [submittedBy], references: [id])
+  entries     TemperatureReportEntry[]
+
+  @@index([date])
+  @@index([submittedBy])
+  @@index([createdAt])
+}
+
+model TemperatureReportEntry {
+  id                 String             @id @default(cuid())
+  reportId           String
+  fridgeId           String
+  temperatureInRange Boolean            // Whether temperature is in range
+  createdAt          DateTime           @default(now())
+
+  // Relations
+  report             TemperatureReport  @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  fridge             Fridge             @relation(fields: [fridgeId], references: [id], onDelete: Cascade)
+
+  @@index([reportId])
+  @@index([fridgeId])
+}
+

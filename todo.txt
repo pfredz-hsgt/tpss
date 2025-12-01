@@ -1,0 +1,31 @@
+=========================================
+
+1. for non ADMIN role user:
+hide menu Manage Fridge
+hide Editing Mode toggle in PIC Contact Number Page
+
+2. for Past Archive Page - add date selector to view announcement on specific date
+
+3. In Post New Announcement page, remove Target Date selection - all announcement will default to current date
+
+4. In PIC Contact Number Page - hide section that has no contact number
+
+6. Add new tab for Passover in Home menu (separate from announcement in Home menu)
+
+5. Passover will only be notified & viewable by respective groups only (unit) - once user create announcement,  everyone will receive notification,  and can view in Home Page. if user creates passover,  it will notify the selected groups (unit) only and once clicked on notification,  it will redirect to the Passover tab, specifically the said entry in home page.
+
+6. In View Report page,  add ability to export to excel for specific daterange
+
+
+
+
+
+
+
+
+
+
+
+
+
+
