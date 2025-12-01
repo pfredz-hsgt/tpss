@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
-import MobileMenu from '@/components/MobileMenu';
 import { temperatureApi, FridgeSection, Fridge } from '@/lib/api';
 
 export default function ManageFridgesPage() {
@@ -151,16 +150,15 @@ export default function ManageFridgesPage() {
 
   return (
     <div className="flex min-h-screen bg-slate-50">
-      <MobileMenu />
       <Sidebar />
-      
+
       <div className="flex-1 p-4 md:p-8">
         <div className="flex flex-col gap-4 mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="pl-12 md:pl-1">
-            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-              Manage Fridges
-            </h1></div>  
+            <div className="pl-12 md:pl-1">
+              <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+                Manage Fridges
+              </h1></div>
             {editingMode && (
               <button
                 onClick={handleAddSection}
@@ -184,14 +182,12 @@ export default function ManageFridgesPage() {
                   setFridgeForm({ name: '' });
                 }
               }}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
-                editingMode ? 'bg-indigo-600' : 'bg-slate-300'
-              }`}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${editingMode ? 'bg-indigo-600' : 'bg-slate-300'
+                }`}
             >
               <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  editingMode ? 'translate-x-6' : 'translate-x-1'
-                }`}
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${editingMode ? 'translate-x-6' : 'translate-x-1'
+                  }`}
               />
             </button>
             <span className={`text-sm font-medium ${editingMode ? 'text-indigo-600' : 'text-slate-500'}`}>
@@ -348,7 +344,7 @@ export default function ManageFridgesPage() {
                   </div>
                 ) : (
                   <div className="text-center py-8 text-slate-500">
-                    {editingMode 
+                    {editingMode
                       ? 'No fridges in this section. Click "Add Fridge" to add one.'
                       : 'No fridges in this section.'
                     }

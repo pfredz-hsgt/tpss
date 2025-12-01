@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
-import MobileMenu from '@/components/MobileMenu';
 import RichTextDisplay from '@/components/RichTextDisplay';
 import { format } from 'date-fns';
 import { announcementApi, publicApi, Announcement, Category } from '@/lib/api';
@@ -17,7 +16,7 @@ export default function ArchivePage() {
   const [dateFilter, setDateFilter] = useState<string>('all');
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [loading, setLoading] = useState(true);
-  
+
   // Helper function to format date as YYYY-MM-DD in local timezone
   const formatLocalDate = (date: Date) => {
     const year = date.getFullYear();
@@ -33,7 +32,7 @@ export default function ArchivePage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      
+
       const cats = await publicApi.getCategories();
       setCategories(cats);
 
@@ -64,7 +63,7 @@ export default function ArchivePage() {
       const selected = new Date(selectedDate);
       return formatLocalDate(annDate) === formatLocalDate(selected);
     }
-    
+
     // Otherwise use the date filter
     if (dateFilter === 'today') {
       const today = new Date();
@@ -86,12 +85,11 @@ export default function ArchivePage() {
 
   return (
     <div className="flex min-h-screen bg-slate-50">
-      <MobileMenu />
       <Sidebar />
-      
+
       <div className="flex-1 p-4 md:p-8">
-      <div className="pl-12 md:pl-1">
-        <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">Past Archive</h1>
+        <div className="pl-12 md:pl-1">
+          <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">Past Archive</h1>
         </div>
         {/* Filters */}
         <div className="mb-6 space-y-4">
@@ -103,7 +101,7 @@ export default function ArchivePage() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="flex-1 w-full sm:min-w-0 px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm hover:border-slate-300 transition-colors"
             />
-            
+
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
@@ -130,7 +128,7 @@ export default function ArchivePage() {
               <option value="week">Last Week</option>
               <option value="month">Last Month</option>
             </select>
-            
+
             <input
               type="date"
               value={selectedDate}
@@ -195,11 +193,11 @@ export default function ArchivePage() {
                 {ann.responses && ann.responses.length > 0 && (
                   <div className="border-t-2 border-slate-100 mb-4"></div>
                 )}
-                
+
                 {/* Responses Section */}
                 {(() => {
                   const userResponse = ann.responses?.find(r => r.userId === user?.id);
-                  
+
                   if (userResponse) {
                     // Show only current user's response
                     return (

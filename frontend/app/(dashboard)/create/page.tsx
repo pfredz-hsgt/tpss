@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
-import MobileMenu from '@/components/MobileMenu';
 import { announcementApi, passoverApi, publicApi, Category, Template, User, Group } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 
@@ -41,32 +40,29 @@ export default function CreatePage() {
 
   return (
     <div className="flex min-h-screen bg-slate-50">
-      <MobileMenu />
       <Sidebar />
-      
+
       <div className="flex-1 p-4 md:p-8">
-      <div className="pl-12 md:pl-1">
-        <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">Create New</h1>
+        <div className="pl-12 md:pl-1">
+          <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">Create New</h1>
         </div>
         <div className="mb-6">
           <div className="flex gap-4 border-b-2 border-slate-200">
             <button
               onClick={() => setType('announcement')}
-              className={`py-3 px-5 border-b-2 font-semibold transition-all ${
-                type === 'announcement'
+              className={`py-3 px-5 border-b-2 font-semibold transition-all ${type === 'announcement'
                   ? 'border-indigo-600 text-indigo-600 transform scale-105'
                   : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
-              }`}
+                }`}
             >
               Announcement
             </button>
             <button
               onClick={() => setType('passover')}
-              className={`py-3 px-5 border-b-2 font-semibold transition-all ${
-                type === 'passover'
+              className={`py-3 px-5 border-b-2 font-semibold transition-all ${type === 'passover'
                   ? 'border-cyan-600 text-cyan-600 transform scale-105'
                   : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
-              }`}
+                }`}
             >
               Passover
             </button>
@@ -112,8 +108,8 @@ export default function CreatePage() {
   );
 }
 
-function AnnouncementForm({ categories, templates, onSuccess, onError }: { 
-  categories: Category[]; 
+function AnnouncementForm({ categories, templates, onSuccess, onError }: {
+  categories: Category[];
   templates: Template[];
   onSuccess: () => void;
   onError: (error: string) => void;
@@ -154,7 +150,7 @@ function AnnouncementForm({ categories, templates, onSuccess, onError }: {
       // Always use current date as target date
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
+
       await announcementApi.createAnnouncement({
         ...formData,
         targetDate: formatLocalDate(today),
@@ -200,7 +196,7 @@ function AnnouncementForm({ categories, templates, onSuccess, onError }: {
             ))}
           </select>
         </div>
-      <div>
+        <div>
           <label className="block text-sm font-semibold text-slate-700 mb-2">
             Template (Optional)
           </label>
@@ -351,7 +347,7 @@ function PassoverForm({ categories, groups, currentUser, onSuccess, onError }: {
         content: typeof formData.content === 'string' ? formData.content : JSON.stringify(formData.content),
         attachments: attachments || undefined,
       });
-      
+
       onSuccess();
       setFormData({
         groupId: '',

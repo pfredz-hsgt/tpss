@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Sidebar from '@/components/Sidebar';
-import MobileMenu from '@/components/MobileMenu';
 import { useAuth } from '@/lib/auth';
 import { adminApi, User, Group, Category, Template } from '@/lib/api';
 import { UserRole } from '@/types';
@@ -10,12 +9,12 @@ import { UserRole } from '@/types';
 export default function AdminPage() {
   const { isAdmin } = useAuth();
   const [activeTab, setActiveTab] = useState<'users' | 'groups' | 'categories' | 'templates'>('users');
-  
+
   const [users, setUsers] = useState<User[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [templates, setTemplates] = useState<Template[]>([]);
-  
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -23,7 +22,7 @@ export default function AdminPage() {
     try {
       setLoading(true);
       setError('');
-      
+
       // Always load categories and users as they're needed for forms
       const [usersData, groupsData, categoriesData, templatesData] = await Promise.all([
         adminApi.getUsers().catch(() => []),
@@ -64,49 +63,47 @@ export default function AdminPage() {
 
   return (
     <div className="flex min-h-screen bg-slate-50">
-      <MobileMenu />
       <Sidebar />
       <div className="flex-1 p-4 md:p-8 overflow-x-hidden">
-      <div className="pl-12 md:pl-1">
-        <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">Admin Dashboard</h1>
-      </div>
-      <div className="border-b-2 border-slate-200 mb-6">
-        <nav className="-mb-0.5 flex flex-wrap gap-2 md:gap-4">
-          {(['users', 'groups', 'categories', 'templates'] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`py-3 md:py-4 px-4 md:px-5 border-b-2 font-semibold text-sm transition-all ${
-                activeTab === tab
-                  ? 'border-indigo-600 text-indigo-600 transform scale-105'
-                  : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
-              }`}
-            >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </button>
-          ))}
-        </nav>
-      </div>
-
-      {error && (
-        <div className="bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-lg mb-4 shadow-sm">
-          <span className="font-medium">{error}</span>
+        <div className="pl-12 md:pl-1">
+          <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">Admin Dashboard</h1>
         </div>
-      )}
-
-      {loading ? (
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+        <div className="border-b-2 border-slate-200 mb-6">
+          <nav className="-mb-0.5 flex flex-wrap gap-2 md:gap-4">
+            {(['users', 'groups', 'categories', 'templates'] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`py-3 md:py-4 px-4 md:px-5 border-b-2 font-semibold text-sm transition-all ${activeTab === tab
+                    ? 'border-indigo-600 text-indigo-600 transform scale-105'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                  }`}
+              >
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
+          </nav>
         </div>
-      ) : (
-        <>
-          {activeTab === 'users' && <UsersTab users={users} onRefresh={loadData} groups={groups} />}
-          {activeTab === 'groups' && <GroupsTab groups={groups} onRefresh={loadData} users={users} />}
-          {activeTab === 'categories' && <CategoriesTab categories={categories} onRefresh={loadData} />}
-          {activeTab === 'templates' && <TemplatesTab templates={templates} onRefresh={loadData} categories={categories} />}
-        </>
-      )}
+
+        {error && (
+          <div className="bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-lg mb-4 shadow-sm">
+            <span className="font-medium">{error}</span>
+          </div>
+        )}
+
+        {loading ? (
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading...</p>
+          </div>
+        ) : (
+          <>
+            {activeTab === 'users' && <UsersTab users={users} onRefresh={loadData} groups={groups} />}
+            {activeTab === 'groups' && <GroupsTab groups={groups} onRefresh={loadData} users={users} />}
+            {activeTab === 'categories' && <CategoriesTab categories={categories} onRefresh={loadData} />}
+            {activeTab === 'templates' && <TemplatesTab templates={templates} onRefresh={loadData} categories={categories} />}
+          </>
+        )}
       </div>
     </div>
   );
@@ -128,7 +125,7 @@ function UsersTab({ users, onRefresh, groups }: { users: User[]; onRefresh: () =
           Create User
         </button>
       </div>
-      
+
       <div className="bg-white shadow-lg overflow-hidden rounded-xl">
         <ul className="divide-y divide-slate-100">
           {users.map((user) => (
@@ -213,7 +210,7 @@ function GroupsTab({ groups, onRefresh, users }: { groups: Group[]; onRefresh: (
           Create Group
         </button>
       </div>
-      
+
       <div className="bg-white shadow-lg overflow-hidden rounded-xl">
         <ul className="divide-y divide-gray-200">
           {groups.map((group) => (
@@ -297,7 +294,7 @@ function CategoriesTab({ categories, onRefresh }: { categories: Category[]; onRe
           Create Category
         </button>
       </div>
-      
+
       <div className="bg-white shadow-lg overflow-hidden rounded-xl">
         <ul className="divide-y divide-gray-200">
           {categories.map((category) => (
@@ -380,7 +377,7 @@ function TemplatesTab({ templates, onRefresh, categories }: { templates: Templat
           Create Template
         </button>
       </div>
-      
+
       <div className="bg-white shadow-lg overflow-hidden rounded-xl">
         <ul className="divide-y divide-gray-200">
           {templates.map((template) => (
@@ -394,9 +391,8 @@ function TemplatesTab({ templates, onRefresh, categories }: { templates: Templat
                   <p className="text-xs text-gray-400 break-words">
                     Content: {typeof template.questions === 'string' ? `${template.questions.length} chars` : (Array.isArray(template.questions) ? `${template.questions.length} items (legacy)` : 'N/A')}
                   </p>
-                  <span className={`inline-block mt-1 px-2 py-1 text-xs rounded ${
-                    template.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                  }`}>
+                  <span className={`inline-block mt-1 px-2 py-1 text-xs rounded ${template.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                    }`}>
                     {template.isActive ? 'Active' : 'Inactive'}
                   </span>
                 </div>
@@ -515,7 +511,7 @@ function UserForm({ user, groups, onClose }: { user?: User; groups: Group[]; onC
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-4 md:p-6">
           <h3 className="text-lg font-semibold mb-4">{user ? 'Edit User' : 'Create User'}</h3>
-          
+
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
               {error}
@@ -671,7 +667,7 @@ function GroupForm({ group, users, onClose }: { group?: Group; users: User[]; on
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-4 md:p-6">
           <h3 className="text-lg font-semibold mb-4">{group ? 'Edit Group' : 'Create Group'}</h3>
-          
+
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
               {error}
@@ -809,7 +805,7 @@ function CategoryForm({ category, onClose }: { category?: Category; onClose: () 
       <div className="bg-white rounded-lg max-w-md w-full">
         <div className="p-4 md:p-6">
           <h3 className="text-lg font-semibold mb-4">{category ? 'Edit Category' : 'Create Category'}</h3>
-          
+
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
               {error}
@@ -957,7 +953,7 @@ function TemplateForm({ template, categories, onClose }: { template?: Template; 
       <div className="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-4 md:p-6">
           <h3 className="text-lg font-semibold mb-4">{template ? 'Edit Template' : 'Create Template'}</h3>
-          
+
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
               {error}

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
-import MobileMenu from '@/components/MobileMenu';
 import { temperatureApi, TemperatureReport } from '@/lib/api';
 import { format } from 'date-fns';
 import { useAuth } from '@/lib/auth';
@@ -41,11 +40,11 @@ export default function ViewReportsPage() {
       start.setHours(0, 0, 0, 0);
       const end = new Date(endDate);
       end.setHours(23, 59, 59, 999);
-      
+
       // Fetch reports for each date in the range
       const allReports: TemperatureReport[] = [];
       const currentDate = new Date(start);
-      
+
       while (currentDate <= end) {
         const dateStr = formatLocalDate(currentDate);
         try {
@@ -57,7 +56,7 @@ export default function ViewReportsPage() {
         }
         currentDate.setDate(currentDate.getDate() + 1);
       }
-      
+
       setReports(allReports);
     } catch (err: any) {
       setError(err.message || 'Failed to load reports');
@@ -120,7 +119,7 @@ export default function ViewReportsPage() {
           const section = entry.fridge?.section?.name || 'Unknown';
           const fridgeName = entry.fridge?.name || 'Unknown';
           const inRange = entry.temperatureInRange ? 'Yes' : 'No';
-          
+
           rows.push([
             reportDate,
             reportTime,
@@ -165,14 +164,13 @@ export default function ViewReportsPage() {
 
   return (
     <div className="flex min-h-screen bg-slate-50">
-      <MobileMenu />
       <Sidebar />
-      
+
       <div className="flex-1 p-4 md:p-8">
-      <div className="pl-12 md:pl-1">
-        <h1 className="text-2xl md:text-3xl font-bold mb-6 bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-          View Temperature Reports
-        </h1> </div>
+        <div className="pl-12 md:pl-1">
+          <h1 className="text-2xl md:text-3xl font-bold mb-6 bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+            View Temperature Reports
+          </h1> </div>
 
         {error && (
           <div className="bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-lg mb-4 shadow-sm">
@@ -259,7 +257,7 @@ export default function ViewReportsPage() {
                     {timeReports.map((report) => (
                       <div key={report.id} className="border-2 border-slate-200 rounded-lg overflow-hidden">
                         {/* Report Header */}
-                        <div 
+                        <div
                           className="bg-slate-50 p-4 cursor-pointer hover:bg-slate-100 transition-colors"
                           onClick={() => toggleExpandReport(report.id)}
                         >
@@ -273,7 +271,7 @@ export default function ViewReportsPage() {
                                   {format(new Date(report.createdAt), 'MMM d, yyyy HH:mm')}
                                 </span>
                               </div>
-                              
+
                               {report.remarks && (
                                 <div className="text-sm text-slate-600">
                                   <span className="font-medium">Remarks:</span> {report.remarks}
@@ -294,9 +292,8 @@ export default function ViewReportsPage() {
                                 </button>
                               )}
                               <svg
-                                className={`w-5 h-5 text-slate-500 transition-transform ${
-                                  expandedReportId === report.id ? 'transform rotate-180' : ''
-                                }`}
+                                className={`w-5 h-5 text-slate-500 transition-transform ${expandedReportId === report.id ? 'transform rotate-180' : ''
+                                  }`}
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -311,7 +308,7 @@ export default function ViewReportsPage() {
                         {expandedReportId === report.id && report.entries && (
                           <div className="p-4 bg-white border-t-2 border-slate-200">
                             <h3 className="text-sm font-semibold text-slate-700 mb-3">Fridge Status Details</h3>
-                            
+
                             {/* Group entries by section */}
                             {(() => {
                               const entriesBySection: Record<string, typeof report.entries> = {};
@@ -332,11 +329,10 @@ export default function ViewReportsPage() {
                                         {sectionEntries.map((entry) => (
                                           <div
                                             key={entry.id}
-                                            className={`flex items-center gap-2 px-3 py-2 rounded-lg ${
-                                              entry.temperatureInRange
+                                            className={`flex items-center gap-2 px-3 py-2 rounded-lg ${entry.temperatureInRange
                                                 ? 'bg-emerald-100 text-emerald-800'
                                                 : 'bg-red-100 text-red-800'
-                                            }`}
+                                              }`}
                                           >
                                             <span className="text-lg">
                                               {entry.temperatureInRange ? '✓' : '✗'}

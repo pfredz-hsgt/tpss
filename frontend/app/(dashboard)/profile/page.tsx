@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
-import MobileMenu from '@/components/MobileMenu';
 import { useAuth } from '@/lib/auth';
 import { authApi } from '@/lib/api';
 import { User, Group } from '@/types';
@@ -66,12 +65,11 @@ export default function ProfilePage() {
 
   return (
     <div className="flex min-h-screen">
-      <MobileMenu />
       <Sidebar />
-      
+
       <div className="flex-1 p-8">
-      <div className="pl-8 md:pl-1">
-        <h1 className="text-3xl font-bold mb-6">User Profile</h1> </div>    
+        <div className="pl-8 md:pl-1">
+          <h1 className="text-3xl font-bold mb-6">User Profile</h1> </div>
 
         {userData && (
           <div className="bg-white rounded-lg shadow p-6 max-w-2xl">
@@ -138,7 +136,7 @@ export default function ProfilePage() {
                       {success}
                     </div>
                   )}
-                  
+
                   <div>
                     <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-1">
                       Current Password
