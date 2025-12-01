@@ -1,4 +1,4 @@
-// 1. Dynamic URL: 10.0.2.2 for Android, localhost for Web
+// Get the base API URL from environment variable or default to localhost
 const getBaseUrl = () => {
 
   // Default to env var or localhost for web
@@ -23,7 +23,7 @@ class ApiClient {
     options: RequestInit = {}
   ): Promise<T> {
     const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
-    
+
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
       ...options.headers,
@@ -160,19 +160,19 @@ export const adminApi = {
   createUser: (data: Partial<User> & { password: string; groupIds?: string[] }) => api.post<User>('/api/admin/users', data),
   updateUser: (id: string, data: Partial<User> & { groupIds?: string[] }) => api.put<User>(`/api/admin/users/${id}`, data),
   deleteUser: (id: string) => api.delete(`/api/admin/users/${id}`),
-  
+
   // Groups
   getGroups: () => api.get<Group[]>('/api/admin/groups'),
   createGroup: (data: Partial<Group> & { userIds?: string[] }) => api.post<Group>('/api/admin/groups', data),
   updateGroup: (id: string, data: Partial<Group> & { userIds?: string[] }) => api.put<Group>(`/api/admin/groups/${id}`, data),
   deleteGroup: (id: string) => api.delete(`/api/admin/groups/${id}`),
-  
+
   // Categories
   getCategories: () => api.get<Category[]>('/api/admin/categories'),
   createCategory: (data: Partial<Category>) => api.post<Category>('/api/admin/categories', data),
   updateCategory: (id: string, data: Partial<Category>) => api.put<Category>(`/api/admin/categories/${id}`, data),
   deleteCategory: (id: string) => api.delete(`/api/admin/categories/${id}`),
-  
+
   // Templates
   getTemplates: () => api.get<Template[]>('/api/admin/templates'),
   createTemplate: (data: Partial<Template> & { questions: string | any[] }) => api.post<Template>('/api/admin/templates', data),
@@ -222,7 +222,7 @@ export const announcementApi = {
     return api.get<Announcement[]>(`/api/announcements${queryString ? `?${queryString}` : ''}`);
   },
   getAnnouncement: (id: string) => api.get<Announcement>(`/api/announcements/${id}`),
-  createAnnouncement: (data: Partial<Announcement> & { title: string; content: string; categoryId: string; taggedUserIds?: string[]; taggedGroupIds?: string[]; targetDate?: string }) => 
+  createAnnouncement: (data: Partial<Announcement> & { title: string; content: string; categoryId: string; taggedUserIds?: string[]; taggedGroupIds?: string[]; targetDate?: string }) =>
     api.post<Announcement>('/api/announcements', data),
   respondToAnnouncement: (id: string, response: string) => api.post<AnnouncementResponse>(`/api/announcements/${id}/respond`, { response }),
   updateAnnouncement: (id: string, data: Partial<Announcement>) => api.put<Announcement>(`/api/announcements/${id}`, data),
@@ -272,19 +272,19 @@ export const passoverApi = {
     return api.get<Passover[]>(`/api/passover${queryString ? `?${queryString}` : ''}`);
   },
   getPassover: (id: string) => api.get<Passover>(`/api/passover/${id}`),
-  createPassover: (data: { incomingUserId?: string; groupId?: string; categoryId: string; content: string; attachments?: PassoverAttachment[] }) => 
+  createPassover: (data: { incomingUserId?: string; groupId?: string; categoryId: string; content: string; attachments?: PassoverAttachment[] }) =>
     api.post<Passover>('/api/passover', data),
   uploadFiles: async (files: File[]) => {
     const formData = new FormData();
     files.forEach((file) => {
       formData.append('files', file);
     });
-    
+
     const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
     if (!token) {
       throw new Error('No authentication token found');
     }
-    
+
     const response = await fetch(`${API_URL}/api/passover/upload`, {
       method: 'POST',
       headers: {
@@ -292,12 +292,12 @@ export const passoverApi = {
       },
       body: formData,
     });
-    
+
     if (!response.ok) {
       const error = await response.json().catch(() => ({ error: 'Upload failed' }));
       throw new Error(error.error || 'Upload failed');
     }
-    
+
     return response.json() as Promise<{ files: PassoverAttachment[] }>;
   },
   acknowledgePassover: (id: string) => api.post(`/api/passover/${id}/acknowledge`),
@@ -383,23 +383,23 @@ export interface TemperatureReport {
 export const temperatureApi = {
   // Fridge Sections
   getFridgeSections: () => api.get<FridgeSection[]>('/api/temperature/sections'),
-  createFridgeSection: (data: { name: string; sortOrder?: number }) => 
+  createFridgeSection: (data: { name: string; sortOrder?: number }) =>
     api.post<FridgeSection>('/api/temperature/sections', data),
-  updateFridgeSection: (id: string, data: { name?: string; sortOrder?: number }) => 
+  updateFridgeSection: (id: string, data: { name?: string; sortOrder?: number }) =>
     api.put<FridgeSection>(`/api/temperature/sections/${id}`, data),
   deleteFridgeSection: (id: string) => api.delete(`/api/temperature/sections/${id}`),
 
   // Fridges
-  createFridge: (data: { sectionId: string; name: string; sortOrder?: number }) => 
+  createFridge: (data: { sectionId: string; name: string; sortOrder?: number }) =>
     api.post<Fridge>('/api/temperature/fridges', data),
-  updateFridge: (id: string, data: { name?: string; sortOrder?: number }) => 
+  updateFridge: (id: string, data: { name?: string; sortOrder?: number }) =>
     api.put<Fridge>(`/api/temperature/fridges/${id}`, data),
   deleteFridge: (id: string) => api.delete(`/api/temperature/fridges/${id}`),
 
   // PIC Contacts
-  createPICContact: (data: { sectionId: string; name: string; phoneNumber: string; sortOrder?: number }) => 
+  createPICContact: (data: { sectionId: string; name: string; phoneNumber: string; sortOrder?: number }) =>
     api.post<PICContact>('/api/temperature/pic-contacts', data),
-  updatePICContact: (id: string, data: { name?: string; phoneNumber?: string; sortOrder?: number }) => 
+  updatePICContact: (id: string, data: { name?: string; phoneNumber?: string; sortOrder?: number }) =>
     api.put<PICContact>(`/api/temperature/pic-contacts/${id}`, data),
   deletePICContact: (id: string) => api.delete(`/api/temperature/pic-contacts/${id}`),
 
@@ -417,11 +417,11 @@ export const temperatureApi = {
     return api.get<TemperatureReport[]>(`/api/temperature/reports${queryString ? `?${queryString}` : ''}`);
   },
   getTemperatureReport: (id: string) => api.get<TemperatureReport>(`/api/temperature/reports/${id}`),
-  createTemperatureReport: (data: { 
-    date: string; 
-    time: string; 
-    remarks?: string; 
-    entries: { fridgeId: string; temperatureInRange: boolean }[] 
+  createTemperatureReport: (data: {
+    date: string;
+    time: string;
+    remarks?: string;
+    entries: { fridgeId: string; temperatureInRange: boolean }[]
   }) => api.post<TemperatureReport>('/api/temperature/reports', data),
   deleteTemperatureReport: (id: string) => api.delete(`/api/temperature/reports/${id}`),
 };
