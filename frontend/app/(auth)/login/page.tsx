@@ -33,7 +33,7 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8 p-10 bg-white rounded-2xl shadow-2xl">
         <div>
           <h2 className="mt-2 text-center text-4xl font-extrabold bg-gradient-to-r from-indigo-600 to-cyan-600 bg-clip-text text-transparent">
-            The Passover System
+            The Passover v2
           </h2>
           <p className="mt-3 text-center text-base text-slate-600 font-medium">
             Sign in to your account
